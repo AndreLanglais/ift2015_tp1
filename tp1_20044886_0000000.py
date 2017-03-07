@@ -139,54 +139,56 @@ class MetaGame:
 
         return possible
     
-    def OutputBoard (self)
-	a = 0 ## Mettre plus significatif
-	ligne = "" 
-	signe = [" . " , " x ", " o "]
-	
-    
-	for k in range(0,3):
-		for j in range(0,3):
-			for i in range(0,3):
-							
-				##TROUVER BELLE ALTERNATIVE ou plus clair
-				valuea = self._entier >> ((80-(a+i*9)) <<1 ) & 3
-				valueb = self._entier >> ((80-((a+1)+i*9)) <<1 ) & 3
-				valuec = self._entier >> ((80-((a+2)+i*9)) <<1 ) & 3
-			
-				##TROUVER BELLE ALTERNATIVE (IF ELSE) ou plus clair
-				value = a+i*9
-				
-				if(value != self._last):
-					ligne += signe[valuea]
-				else:
-					ligne += (signe[valuea]).upper()
-				if(value+1 != self._last):
-					ligne += signe[valueb]
-				else:
-					ligne += (signe[valuea]).upper()
-				if(value+2 != self._last):
-					ligne += signe[valuec]
-				else:
-					ligne += (signe[valuea]).upper()
-				
-				ligne += "|" 
-				
-				
-			print(ligne[:-1])
-			ligne = ""
-			a+=3
-		if(k != 2):
-			print("-"*29)
-		a +=18
+    def OutputBoard (self):
+        a = 0  # Mettre plus significatif
+        ligne = ""
+        signe = [" . " , " x ", " o "]
+
+
+        for k in range(0,3):
+            for j in range(0,3):
+                for i in range(0,3):
+
+                    # TROUVER BELLE ALTERNATIVE ou plus clair
+                    valuea = self._entier >> ((80-(a+i*9)) <<1 ) & 3
+                    valueb = self._entier >> ((80-((a+1)+i*9)) <<1 ) & 3
+                    valuec = self._entier >> ((80-((a+2)+i*9)) <<1 ) & 3
+
+                    # TROUVER BELLE ALTERNATIVE (IF ELSE) ou plus clair
+                    value = a+i*9
+
+                    if(value != self._last):
+                        ligne += signe[valuea]
+                    else:
+                        ligne += (signe[valuea]).upper()
+                    if(value+1 != self._last):
+                        ligne += signe[valueb]
+                    else:
+                        ligne += (signe[valuea]).upper()
+                    if(value+2 != self._last):
+                        ligne += signe[valuec]
+                    else:
+                        ligne += (signe[valuea]).upper()
+
+                    ligne += "|"
+
+
+                print(ligne[:-1])
+                ligne = ""
+                a += 3
+            if k != 2:
+                print("-"*29)
+            a += 18
         
 if __name__ == '__main__':
 
     entier = 459329034283597291728327479273734123420780266358036
     print(bin(entier))
     meta = MetaGame(entier)
+    meta.OutputBoard()
+    meta.getInt(54)
+    meta = MetaGame(meta.getInt(54))
     print(meta.possibleMoves())
-
 
 
 class Node:
