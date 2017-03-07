@@ -69,7 +69,7 @@ class MetaGame:
                 value = self._entier >> ((80 - j) << 1) & 3
                 t = (t << 2) + value
             tmpgame = Game(t)
-            value = tmpgame.winner()
+            value = tmpgame.winner()  # test chaque sous partie pour un gagnant
             q = (q << 2) + value
 
         # q devient un obj Game, test pour winner
@@ -78,9 +78,8 @@ class MetaGame:
 
     def getInt(self,move):
         tmp = (self._Player << ((80 - move) << 1)) + self._entier
-        tmp &= 11692013098647223345629478661730264157247460343807
-        print(bin(tmp))
-        tmp += move << 162
+        tmp &= 11692013098647223345629478661730264157247460343807  # remove 7 premiers bits avec un masque de 162bits
+        tmp += move << 162  # padding de 0 et combinaison
         return tmp
 
     def possibleMoves(self):
