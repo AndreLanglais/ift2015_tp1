@@ -1,5 +1,5 @@
 import sys
-
+import random
 
 class Game:
     def __init__(self,jeu):
@@ -193,6 +193,7 @@ if __name__ == '__main__':
     print(meta.possibleMoves())
 """
 
+
 class Node:
     def __init__(self,data):
         self._data = data
@@ -208,12 +209,48 @@ class Node:
         return self._children
 
     def sample(self, n):
-        return n
+        # faire les stats sur le dernier coup joué
+        # ex: quels sont les chances de win si on joue sur la case 54
+        # le prochain coup est a faire par l'adversaire
+        # last = self._data.get_last()
+
+        # structure pour stat [0] nombre total de simulation [1] win de x [2] win de o
+        stats_win = [n,0,0]
+
+        possible = self._data.possibleMoves()  # get les coups possibles de l'adversaire
+
+        for i in range(0, n):  # faire n simulation, chaque simulation se fait jusqu'a la fin de la partie
+            fin_de_partie = False
+            while not fin_de_partie:
+                if not possible:
+                    break
+                choix_random = random.choice(possible)  # prendre un coup au hasard
+
+                tmpmeta = MetaGame(self._data.getInt(choix_random))  # faire le coup
+                print("\n")
+                print(i)
+                tmpmeta.OutputBoard()
+                # test fin de partie et update stats
+                win = tmpmeta.winner()
+                player = tmpmeta.get_player()
+                if win == player:
+                    stats_win[player] += 1
+                    break
+                elif win == 3:  # partie est nulle, pas de stats
+                    break
+
+                # coups possible pour notre joueur
+                possible = tmpmeta.possibleMoves()
+
+        return stats_win
 
 
 class GameTree:
     def __init__(self, root):
         self._root = root
+
+    def get_root(self):
+        return self._root
 
     def print_tree(self):
         print(str(self._root.get_data()))
@@ -248,24 +285,37 @@ else:
     no_mode(entier)
 """
 
-entier = 459329034283597291728327479273734123420780266358036
+entier = 459329034283597291728327479273734123385595894269204
+# 459329034283597291728327479273734123420780266358036
+# 457867532646266388810123794441017840401124333815060 modifié le o en pos 0 pour un x
+# 459329034283597291728327479273734123385595894269204 mod 0 en pos 58 en .
+print(int(entier))
+# 0b1001110100100100100100010010000000110011010010000010010000100001010010110011010101010000110100010010101010000010000000100011001100110100010100110000001011000010100010100
 MAINGAME = MetaGame(entier)
-
+MAINGAME.OutputBoard()
 # arbre avec profondeur de 1
 root = Node(MAINGAME)
 coups_possibles = root.get_data().possibleMoves()
+
 for coup in coups_possibles:
     game_possible = MetaGame(MAINGAME.getInt(coup))
     root.add_child(Node(game_possible))
 
 # test chaque enfant pour une fin de partie
 for child in root.get_children():
-    if child.get_data().winner() == 1 or child.get_data().winner() == 2:
+    print(child.get_data().winner())
+    print(child.get_data().get_player())
+    if child.get_data().winner() == root.get_data().get_player():  # si le winner est le parent, win
         print(child.get_data().get_entier())
         print(bin(child.get_data().get_entier()))
-        child.get_data().OutputBoard()  # ERREUR: O n'apparait pas a la position 56
         print(child.get_data().get_last())
+        child.get_data().OutputBoard()
+        break
 
 MAINTREE = GameTree(root)
+for i in MAINTREE.get_root().get_children():
+    print(i.sample(10))
+
+
 
 
