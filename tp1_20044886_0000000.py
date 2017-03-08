@@ -155,7 +155,7 @@ class MetaGame:
                     valuea = self._entier >> ((80 - (a + i * 9)) << 1) & 3
                     valueb = self._entier >> ((80 - ((a + 1) + i * 9)) << 1) & 3
                     valuec = self._entier >> ((80 - ((a + 2) + i * 9)) << 1) & 3
-                    
+
                     # TROUVER BELLE ALTERNATIVE (IF ELSE) ou plus clair
                     value = a+i*9
 
@@ -263,7 +263,7 @@ for child in root.get_children():
     if child.get_data().winner() == 1 or child.get_data().winner() == 2:
         print(child.get_data().get_entier())
         print(bin(child.get_data().get_entier()))
-        child.get_data().OutputBoard()
+        child.get_data().OutputBoard()  # ERREUR: O n'apparait pas a la position 56
         print(child.get_data().get_last())
 
 MAINTREE = GameTree(root)
