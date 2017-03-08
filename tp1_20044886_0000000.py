@@ -2,7 +2,7 @@ import sys
 
 
 class Game:
-    def __init__(self,jeu):
+    def __init__(self, jeu):
         self._jeu = jeu
 
     def winner(self):
@@ -10,9 +10,9 @@ class Game:
         # 1 x gagnant
         # 2 o gagnant
         # 3 partie nulle
-        winners = [[0,1,2], [3,4,5], [6,7,8],
-                   [0,3,6], [1,4,7], [2,5,8],
-                   [0,4,8], [2,4,6]]
+        winners = [[0, 1, 2], [3, 4, 5], [6, 7, 8],
+                   [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                   [0, 4, 8], [2, 4, 6]]
         win = 0
         cases_vides = 0
         nulle = 3  # code pour partie nulle
@@ -44,6 +44,7 @@ class Game:
 
         return nulle if (cases_vides == 0 and win == 0) else win
 
+
 """
 if __name__ == '__main__':
 
@@ -65,7 +66,7 @@ class MetaGame:
     def __init__(self, entier):
         self._entier = entier
         self._last = entier >> 162 & 127
-        self._player = (entier >> ((80 - self._last) << 1) & 3) ^ 0b11 # XOR avec 0b11 pour inverser le player
+        self._player = (entier >> ((80 - self._last) << 1) & 3) ^ 0b11  # XOR avec 0b11 pour inverser le player
 
     def get_entier(self):
         return self._entier
@@ -82,7 +83,7 @@ class MetaGame:
     def winner(self):
         q = 1
         for i in range(0, 9):
-            r = range(0 + i*9, 9 + i*9)
+            r = range(0 + i * 9, 9 + i * 9)
             t = 1
             for j in r:
                 value = self._entier >> ((80 - j) << 1) & 3
@@ -96,7 +97,7 @@ class MetaGame:
         tmpgame = Game(q)
         return tmpgame.winner()
 
-    def getInt(self,move):
+    def getInt(self, move):
         new_int = (self._player << ((80 - move) << 1)) + self._entier
         new_int &= 11692013098647223345629478661730264157247460343807  # remove 7 premiers bits avec un masque de 162bits
         new_int += move << 162  # padding de 0 et combinaison
@@ -141,15 +142,15 @@ class MetaGame:
                     continue
 
         return possible
-    
-    def OutputBoard (self):
+
+    def OutputBoard(self):
         a = 0  # Mettre plus significatif
         ligne = ""
         signe = [" . ", " x ", " o "]
 
-        for k in range(0,3):
-            for j in range(0,3):
-                for i in range(0,3):
+        for k in range(0, 3):
+            for j in range(0, 3):
+                for i in range(0, 3):
 
                     # TROUVER BELLE ALTERNATIVE ou plus clair
                     valuea = self._entier >> ((80 - (a + i * 9)) << 1) & 3
@@ -157,17 +158,17 @@ class MetaGame:
                     valuec = self._entier >> ((80 - ((a + 2) + i * 9)) << 1) & 3
 
                     # TROUVER BELLE ALTERNATIVE (IF ELSE) ou plus clair
-                    value = a+i*9
+                    value = a + i * 9
 
-                    if(value != self._last):
+                    if (value != self._last):
                         ligne += signe[valuea]
                     else:
                         ligne += (signe[valuea]).upper()
-                    if(value+1 != self._last):
+                    if (value + 1 != self._last):
                         ligne += signe[valueb]
                     else:
                         ligne += (signe[valueb]).upper()
-                    if(value+2 != self._last):
+                    if (value + 2 != self._last):
                         ligne += signe[valuec]
                     else:
                         ligne += (signe[valuec]).upper()
@@ -178,8 +179,9 @@ class MetaGame:
                 ligne = ""
                 a += 3
             if k != 2:
-                print("-"*29)
+                print("-" * 29)
             a += 18
+
 
 """
 if __name__ == '__main__':
@@ -193,8 +195,9 @@ if __name__ == '__main__':
     print(meta.possibleMoves())
 """
 
+
 class Node:
-    def __init__(self,data):
+    def __init__(self, data):
         self._data = data
         self._children = []
 
@@ -210,6 +213,9 @@ class Node:
     def sample(self, n):
         return n
 
+    def __str__(self):
+        return str(self.get_data())
+
 
 class GameTree:
     def __init__(self, root):
@@ -221,17 +227,63 @@ class GameTree:
         for child in self._root.get_children():
             line += str(child.get_data()) + " "
         print(line)
-		
-		"""
-		def breadth_first_print( self ):
-			Q = ArrayQueue()
-			Q.enqueue( self.root() )
-			while not Q.is_empty():
-				p = Q.dequeue()
-				print( p )
-				for c in self.children( p ):
-					Q.enqueue( c )
-		"""
+
+        def root(self):
+            return self._root
+
+        def children(self, p):
+            p.get_children()
+
+        def breadth_first_print(self):
+            ### TO DO : Generer larbre avec X étages
+            Q = ArrayQueue()
+            Q.enqueue(self.root())
+            while not Q.is_empty():
+                p = Q.dequeue()
+                print(p)
+                for c in self.children(p):
+                    Q.enqueue(c)
+
+
+##Queue pour afficher l'arbre de possibilité
+class ArrayQueue:
+    def __init__(self, capacity=1):
+        self._data = [None] * capacity
+        self._capacity = capacity
+        self._size = 0
+        self._front = 0
+
+    def __len__(self):
+        return self._size
+
+    def enqueue(self):
+        if self._size == len(self._data):
+            self._resize(2 * len(self._data))
+        avail = (self._front + self._size) % len(self._data)
+        self._data[avail] = elem
+        self._size += 1
+
+    def _resize(self, newcapacity):
+        old = self._data
+        self._data = [None] * newcapacity
+        walk = self._front
+        for k in range(self._size):
+            self._data[k] = old[walk]
+            walk = (1 + walk) % len(old)
+        self._front = 0
+        self._capacity = newcapacity
+
+    def dequeue(self):
+        if self.is_empty():
+            return False
+        else:
+            elem = self._data[self._front]
+            self._data[self._front] = None
+            self._front = (self._front + 1) % len(self._data)
+            return elem
+
+    def is_empty(self):
+        return self._size == 0
 
 
 # debut programme
@@ -278,5 +330,3 @@ for child in root.get_children():
         print(child.get_data().get_last())
 
 MAINTREE = GameTree(root)
-
-
