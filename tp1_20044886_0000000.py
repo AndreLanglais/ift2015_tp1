@@ -76,6 +76,9 @@ class MetaGame:
     def get_player(self):
         return self._player
 
+    def __str__(self):
+        return str(self._entier)
+
     def winner(self):
         q = 1
         for i in range(0, 9):
@@ -179,7 +182,8 @@ class MetaGame:
             if k != 2:
                 print("-"*29)
             a += 18
-        
+
+"""
 if __name__ == '__main__':
 
     entier = 459329034283597291728327479273734123420780266358036
@@ -189,52 +193,72 @@ if __name__ == '__main__':
     meta.getInt(54)
     meta = MetaGame(meta.getInt(54))
     print(meta.possibleMoves())
-
+"""
 
 class Node:
     def __init__(self,data):
         self._data = data
         self._children = []
 
+    def get_data(self):
+        return self._data
+
     def add_child(self, obj):
         self._children.append(obj)
+
+    def get_children(self):
+        return self._children
+
+    def sample(self, n):
+        return n
 
 
 class GameTree:
     def __init__(self, root):
         self._root = root
 
-    def __str__(self):
-        return "tree"
+    def print_tree(self):
+        print(str(self._root.get_data()))
+        line = ""
+        for child in self._root.get_children():
+            line += str(child.get_data()) + " "
+        print(line)
 
 
 # debut programme
 
-#entier = sys.argv[0]
-
-#METAGAME = MetaGame(entier)
-
 """
 def p_mode(entier):
-	MetaGame(entier).OutputBoard()
+    MetaGame(entier).OutputBoard()
 
 def no_mode(entier):
-	
+
 def a_mode(profondeur,entier):
-	
+
 entier = 0;
 
 if(sys.argv[1] == "p") :
-	p_mode(int(sys.argv[2]))
-	
+    p_mode(int(sys.argv[2]))
+
 elif(sys.argv[1] == "a") :
-	profondeur = int(sys.argv[2])
-	entier = int(sys.argv[3])
-	a_mode(profondeur,entier)
-	
-else: 
-	entier = int(sys.argv[1])
-	no_mode(entier)
+    profondeur = int(sys.argv[2])
+    entier = int(sys.argv[3])
+    a_mode(profondeur,entier)
+
+else:
+    entier = int(sys.argv[1])
+    no_mode(entier)
 """
+
+entier = 459329034283597291728327479273734123420780266358036
+MAINGAME = MetaGame(entier)
+root = Node(MAINGAME)
+coups_possibles = root.get_data().possibleMoves()
+
+for coup in coups_possibles:
+    game_possible = MetaGame(MAINGAME.getInt(coup))
+    root.add_child(Node(game_possible))
+
+MAINTREE = GameTree(root)
 
 
