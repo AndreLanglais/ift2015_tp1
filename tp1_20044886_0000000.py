@@ -221,6 +221,17 @@ class GameTree:
         for child in self._root.get_children():
             line += str(child.get_data()) + " "
         print(line)
+		
+		"""
+		def breadth_first_print( self ):
+			Q = ArrayQueue()
+			Q.enqueue( self.root() )
+			while not Q.is_empty():
+				p = Q.dequeue()
+				print( p )
+				for c in self.children( p ):
+					Q.enqueue( c )
+		"""
 
 
 # debut programme
