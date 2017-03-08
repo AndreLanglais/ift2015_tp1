@@ -214,3 +214,27 @@ class GameTree:
 
 #METAGAME = MetaGame(entier)
 
+"""
+def p_mode(entier):
+	MetaGame(entier).OutputBoard()
+
+def no_mode(entier):
+	
+def a_mode(profondeur,entier):
+	
+entier = 0;
+
+if(sys.argv[1] == "p") :
+	p_mode(int(sys.argv[2]))
+	
+elif(sys.argv[1] == "a") :
+	profondeur = int(sys.argv[2])
+	entier = int(sys.argv[3])
+	a_mode(profondeur,entier)
+	
+else: 
+	entier = int(sys.argv[1])
+	no_mode(entier)
+"""
+
+
