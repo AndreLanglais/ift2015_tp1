@@ -293,9 +293,15 @@ def p_mode(entier):
     MetaGame(entier).OutputBoard()
 
 def no_mode(entier):
-
+    ##créer une partie a partir de l'entier
+    ##Essait X combinaison de partie jusqua la fin
+    ##analyse statistics sortie selon les statistiques (W)
+    ##Joue le meilleur coup calculer a ce moment
 def a_mode(profondeur,entier):
-
+    ##créer une partie a partir de l'entier
+    ##genere un arbre avec la profondeur demandé
+    ##afficher l'arbre generer en breadth-first
+    ##Fin
 entier = 0;
 
 if(sys.argv[1] == "p") :
