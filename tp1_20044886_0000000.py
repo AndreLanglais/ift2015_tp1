@@ -145,18 +145,17 @@ class MetaGame:
     def OutputBoard (self):
         a = 0  # Mettre plus significatif
         ligne = ""
-        signe = [" . " , " x ", " o "]
-
+        signe = [" . ", " x ", " o "]
 
         for k in range(0,3):
             for j in range(0,3):
                 for i in range(0,3):
 
                     # TROUVER BELLE ALTERNATIVE ou plus clair
-                    valuea = self._entier >> ((80-(a+i*9)) <<1 ) & 3
-                    valueb = self._entier >> ((80-((a+1)+i*9)) <<1 ) & 3
-                    valuec = self._entier >> ((80-((a+2)+i*9)) <<1 ) & 3
-
+                    valuea = self._entier >> ((80 - (a + i * 9)) << 1) & 3
+                    valueb = self._entier >> ((80 - ((a + 1) + i * 9)) << 1) & 3
+                    valuec = self._entier >> ((80 - ((a + 2) + i * 9)) << 1) & 3
+                    
                     # TROUVER BELLE ALTERNATIVE (IF ELSE) ou plus clair
                     value = a+i*9
 
@@ -174,7 +173,6 @@ class MetaGame:
                         ligne += (signe[valuea]).upper()
 
                     ligne += "|"
-
 
                 print(ligne[:-1])
                 ligne = ""
@@ -252,12 +250,21 @@ else:
 
 entier = 459329034283597291728327479273734123420780266358036
 MAINGAME = MetaGame(entier)
+
+# arbre avec profondeur de 1
 root = Node(MAINGAME)
 coups_possibles = root.get_data().possibleMoves()
-
 for coup in coups_possibles:
     game_possible = MetaGame(MAINGAME.getInt(coup))
     root.add_child(Node(game_possible))
+
+# test chaque enfant pour une fin de partie
+for child in root.get_children():
+    if child.get_data().winner() == 1 or child.get_data().winner() == 2:
+        print(child.get_data().get_entier())
+        print(bin(child.get_data().get_entier()))
+        child.get_data().OutputBoard()
+        print(child.get_data().get_last())
 
 MAINTREE = GameTree(root)
 
