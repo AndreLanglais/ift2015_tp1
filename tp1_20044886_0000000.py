@@ -166,11 +166,11 @@ class MetaGame:
                     if(value+1 != self._last):
                         ligne += signe[valueb]
                     else:
-                        ligne += (signe[valuea]).upper()
+                        ligne += (signe[valueb]).upper()
                     if(value+2 != self._last):
                         ligne += signe[valuec]
                     else:
-                        ligne += (signe[valuea]).upper()
+                        ligne += (signe[valuec]).upper()
 
                     ligne += "|"
 
