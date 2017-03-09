@@ -98,13 +98,15 @@ class MetaGame:
         return tmpgame.winner()
 
     def getInt(self, move):
-        new_int = (self._player << ((80 - move) << 1)) + self._entier
+        new_int = (self._player << ((80 - move) << 1)) + self._entier  # a verifier (self._player << ((80 - move) << 1)) + self._entier
         new_int &= 11692013098647223345629478661730264157247460343807  # remove 7 premiers bits avec un masque de 162bits
         new_int += move << 162  # padding de 0 et combinaison
         return new_int
 
     def possibleMoves(self):
         possible = []
+        if self.winner() != 0:
+            return possible
         next_case = self._last % 9
         indice_deb = next_case * 9
         range_indice = range(indice_deb, indice_deb + 9)  # les coups possibles dans le petit tic tac toe
@@ -217,33 +219,47 @@ class Node:
         # last = self._data.get_last()
 
         # structure pour stat [0] nombre total de simulation [1] win de x [2] win de o
-        stats_win = [n,0,0]
 
+        stats_win = [n, 0, 0]
         possible = self._data.possibleMoves()  # get les coups possibles de l'adversaire
+        tmpmeta = self._data
+
+        print(self._data.get_last())
+        print(self._data.get_player())
+        tmpmeta.OutputBoard()
+        print(possible)
+
+        if not possible:
+            return 0
 
         for i in range(0, n):  # faire n simulation, chaque simulation se fait jusqu'a la fin de la partie
+            tmpmeta = self._data
             fin_de_partie = False
+
             while not fin_de_partie:
+                player = tmpmeta.get_player()  # bug : player devient 3 et corrupt la game
+                possible = tmpmeta.possibleMoves()
+
                 if not possible:
                     break
-                choix_random = random.choice(possible)  # prendre un coup au hasard
 
-                tmpmeta = MetaGame(self._data.getInt(choix_random))  # faire le coup
-                print("\n")
-                print(i)
+                choix_random = random.choice(possible)  # prendre un coup au hasard
+                print(possible)
+                print("next play: " + str(choix_random) + " by " + str(player))
+                tmpmeta = MetaGame(tmpmeta.getInt(choix_random))  # faire le coup
                 tmpmeta.OutputBoard()
                 # test fin de partie et update stats
                 win = tmpmeta.winner()
-                player = tmpmeta.get_player()
+                print("WIN_STATE: " + str(win))
+                print("player: " + str(player))
                 if win == player:
                     stats_win[player] += 1
                     break
                 elif win == 3:  # partie est nulle, pas de stats
                     break
+            print("new stats")
 
-                # coups possible pour notre joueur
-                possible = tmpmeta.possibleMoves()
-
+        #print(self._data.get_last())
         return stats_win
 
     def __str__(self):
@@ -354,13 +370,13 @@ else:
 """
 
 entier = 459329034283597291728327479273734123385595894269204
-# 459329034283597291728327479273734123420780266358036
+# 459329034283597291728327479273734123420780266358036 exemple du tp
 # 457867532646266388810123794441017840401124333815060 modifié le o en pos 0 pour un x
 # 459329034283597291728327479273734123385595894269204 mod 0 en pos 58 en .
-print(int(entier))
+#print(int(entier))
 # 0b1001110100100100100100010010000000110011010010000010010000100001010010110011010101010000110100010010101010000010000000100011001100110100010100110000001011000010100010100
 MAINGAME = MetaGame(entier)
-MAINGAME.OutputBoard()
+#MAINGAME.OutputBoard()
 # arbre avec profondeur de 1
 root = Node(MAINGAME)
 coups_possibles = root.get_data().possibleMoves()
@@ -370,14 +386,19 @@ for coup in coups_possibles:
     root.add_child(Node(game_possible))
 
 # test chaque enfant pour une fin de partie
+"""
 for child in root.get_children():
-    print(child.get_data().winner())
-    print(child.get_data().get_player())
+    #print(child.get_data().winner())
+    #print(child.get_data().get_player())
     if child.get_data().winner() == root.get_data().get_player():  # si le winner est le parent, win
-        print(child.get_data().get_entier())
-        print(bin(child.get_data().get_entier()))
-        print(child.get_data().get_last())
-        child.get_data().OutputBoard()
+        #print(child.get_data().get_entier())
+        #print(bin(child.get_data().get_entier()))
+        #print(child.get_data().get_last())
+        #child.get_data().OutputBoard()
         break
-
+"""
 MAINTREE = GameTree(root)
+print("sample")
+print(MAINTREE.get_root().get_children()[0].sample(10))
+#for child in MAINTREE.get_root().get_children():
+#    print(child.sample(10))
