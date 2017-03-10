@@ -66,7 +66,8 @@ class MetaGame:
     def __init__(self, entier):
         self._entier = entier
         self._last = entier >> 162 & 127
-        self._player = (entier >> ((80 - self._last) << 1) & 3) ^ 0b11  # XOR avec 0b11 pour inverser le player
+        value = entier >> ((80 - self._last) << 1) & 3
+        self._player = value ^ 0b11  # XOR avec 0b11 pour inverser le player
 
     def get_entier(self):
         return self._entier
@@ -100,7 +101,7 @@ class MetaGame:
     def getInt(self, move):
         new_int = (self._player << ((80 - move) << 1)) + self._entier  # a verifier (self._player << ((80 - move) << 1)) + self._entier
         new_int &= 11692013098647223345629478661730264157247460343807  # remove 7 premiers bits avec un masque de 162bits
-        new_int += move << 162  # padding de 0 et combinaison
+        new_int += (move << 162)  # padding de 0 et combinaison
         return new_int
 
     def possibleMoves(self):
@@ -148,7 +149,7 @@ class MetaGame:
     def OutputBoard(self):
         a = 0  # Mettre plus significatif
         ligne = ""
-        signe = [" . ", " x ", " o "]
+        signe = [" . ", " x ", " o ", " ? "]
 
         for k in range(0, 3):
             for j in range(0, 3):
@@ -227,7 +228,6 @@ class Node:
         print(self._data.get_last())
         print(self._data.get_player())
         tmpmeta.OutputBoard()
-        print(possible)
 
         if not possible:
             return 0
@@ -254,6 +254,7 @@ class Node:
                 print("player: " + str(player))
                 if win == player:
                     stats_win[player] += 1
+                    print(stats_win)
                     break
                 elif win == 3:  # partie est nulle, pas de stats
                     break
@@ -399,6 +400,14 @@ for child in root.get_children():
 """
 MAINTREE = GameTree(root)
 print("sample")
-print(MAINTREE.get_root().get_children()[0].sample(10))
+#print(MAINTREE.get_root().get_children()[0].sample(1))
 #for child in MAINTREE.get_root().get_children():
 #    print(child.sample(10))
+""" bug lorsqu'on joue 2 cases de suite
+print(str(MAINGAME.getInt(19)))
+t = MetaGame(114414647873514836856224138079674561203278056883476)
+t.OutputBoard()
+t = MetaGame(t.getInt(20))
+print("separator")
+t.OutputBoard()
+"""
