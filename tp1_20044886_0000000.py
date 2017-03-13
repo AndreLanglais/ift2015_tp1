@@ -228,7 +228,7 @@ class Node:
 
         print(self._data.get_last())
         print(self._data.get_player())
-        tmpmeta.OutputBoard()
+        #tmpmeta.OutputBoard()
 
         if not possible:
             return 0
@@ -245,21 +245,21 @@ class Node:
                     break
 
                 choix_random = random.choice(possible)  # prendre un coup au hasard
-                print(possible)
-                print("next play: " + str(choix_random) + " by " + str(player))
+                #print(possible)
+                #print("next play: " + str(choix_random) + " by " + str(player))
                 tmpmeta = MetaGame(tmpmeta.getInt(choix_random))  # faire le coup
-                tmpmeta.OutputBoard()
+                #tmpmeta.OutputBoard()
                 # test fin de partie et update stats
                 win = tmpmeta.winner()
-                print("WIN_STATE: " + str(win))
-                print("player: " + str(player))
+                #print("WIN_STATE: " + str(win))
+                #print("player: " + str(player))
                 if win == player:
                     stats_win[player] += 1
-                    print(stats_win)
+                    #print(stats_win)
                     break
                 elif win == 3:  # partie est nulle, pas de stats
                     break
-            print("new stats")
+            #print("new stats")
 
         #print(self._data.get_last())
         return stats_win
@@ -401,14 +401,6 @@ for child in root.get_children():
 """
 MAINTREE = GameTree(root)
 print("sample")
-#print(MAINTREE.get_root().get_children()[0].sample(1))
-#for child in MAINTREE.get_root().get_children():
-#    print(child.sample(10))
-""" bug lorsqu'on joue 2 cases de suite
-print(str(MAINGAME.getInt(19)))
-t = MetaGame(114414647873514836856224138079674561203278056883476)
-t.OutputBoard()
-t = MetaGame(t.getInt(20))
-print("separator")
-t.OutputBoard()
-"""
+
+for child in MAINTREE.get_root().get_children():
+    print(child.sample(1000))
