@@ -103,7 +103,8 @@ class MetaGame:
         new_int &= ~(127 << 162)  ##Supprime dernier bit jouer ( 7 1er bits )
         new_int += (move << 162)
         return new_int
-
+		
+		
     def possibleMoves(self):
         possible = []
         if self.winner() != 0:
