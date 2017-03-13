@@ -99,9 +99,9 @@ class MetaGame:
         return tmpgame.winner()
 
     def getInt(self, move):
-        new_int = (self._player << ((80 - move) << 1)) + self._entier  # a verifier (self._player << ((80 - move) << 1)) + self._entier
-        new_int &= 11692013098647223345629478661730264157247460343807  # remove 7 premiers bits avec un masque de 162bits
-        new_int += (move << 162)  # padding de 0 et combinaison
+        new_int = (self._player << ((80 - move) << 1)) + self._entier
+        new_int &= ~(127 << 162)  ##Supprime dernier bit jouer ( 7 1er bits )
+        new_int += (move << 162)
         return new_int
 
     def possibleMoves(self):
