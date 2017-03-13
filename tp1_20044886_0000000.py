@@ -225,8 +225,8 @@ class Node:
         possible = self._data.possibleMoves()  # get les coups possibles de l'adversaire
         tmpmeta = self._data
 
-        print(self._data.get_last())
-        print(self._data.get_player())
+        #print(self._data.get_last())
+        #print(self._data.get_player())
         #tmpmeta.OutputBoard()
 
         if not possible:
@@ -375,31 +375,38 @@ entier = 459329034283597291728327479273734123385595894269204
 # 457867532646266388810123794441017840401124333815060 modifié le o en pos 0 pour un x
 # 459329034283597291728327479273734123385595894269204 mod 0 en pos 58 en .
 #print(int(entier))
-# 0b1001110100100100100100010010000000110011010010000010010000100001010010110011010101010000110100010010101010000010000000100011001100110100010100110000001011000010100010100
-MAINGAME = MetaGame(entier)
-#MAINGAME.OutputBoard()
+
 # arbre avec profondeur de 1
-root = Node(MAINGAME)
-coups_possibles = root.get_data().possibleMoves()
+MAINTREE = GameTree(Node(MetaGame(entier)))
+
+coups_possibles = MAINTREE.get_root().get_data().possibleMoves()
 
 for coup in coups_possibles:
-    game_possible = MetaGame(MAINGAME.getInt(coup))
-    root.add_child(Node(game_possible))
+    game_possible = MetaGame(MAINTREE.get_root().get_data().getInt(coup))
+    MAINTREE.get_root().add_child(Node(game_possible))
 
+stats = []
 # test chaque enfant pour une fin de partie
-"""
-for child in root.get_children():
-    #print(child.get_data().winner())
-    #print(child.get_data().get_player())
-    if child.get_data().winner() == root.get_data().get_player():  # si le winner est le parent, win
-        #print(child.get_data().get_entier())
-        #print(bin(child.get_data().get_entier()))
-        #print(child.get_data().get_last())
-        #child.get_data().OutputBoard()
-        break
-"""
-MAINTREE = GameTree(root)
-print("sample")
-
 for child in MAINTREE.get_root().get_children():
-    print(child.sample(1000))
+    if child.get_data().winner() == MAINTREE.get_root().get_data().get_player():  # si le winner est le parent, win
+        print(child.get_data().get_entier())
+        # print(bin(child.get_data().get_entier()))
+        # print(child.get_data().get_last())
+        # child.get_data().OutputBoard()
+        sys.exit(0)
+    child.sample(1000)
+    stats.append(child.sample(1000))
+
+#choisir meilleure stat
+ratio = []
+for i in range(0, len(stats)):
+    ratio.append(stats[i][MAINTREE.get_root().get_data().get_player()] / stats[i][0])  # nombre de partie/total
+
+#get le best coup a jouer
+best_coup = MAINTREE.get_root().get_children()[ratio.index(max(ratio))]
+print(best_coup.get_data())
+
+
+
+
+
