@@ -1,6 +1,7 @@
 import sys
 import random
 
+
 class Game:
     def __init__(self, jeu):
         self._jeu = jeu
@@ -45,29 +46,15 @@ class Game:
         return nulle if (cases_vides == 0 and win == 0) else win
 
 
-"""
-if __name__ == '__main__':
-
-    r = range(45, 54)
-    entier = 459329034283597291728327479273734123420780266358036
-    t = 1
-    for i in r:
-        value = entier >> ((80 - i) << 1) & 3
-        t = (t << 2) + value
-        print(str(bin(t)))
-
-    testGame = Game(t)
-    print(testGame.winner())
-
-"""
-
-
 class MetaGame:
     def __init__(self, entier):
         self._entier = entier
         self._last = entier >> 162 & 127
         value = entier >> ((80 - self._last) << 1) & 3
-        self._player = value ^ 0b11  # XOR avec 0b11 pour inverser le player
+        if entier == 0:
+            self._player = 1  # premier coup de la partie, joueur = x
+        else:
+            self._player = value ^ 0b11  # XOR avec 0b11 pour inverser le player
 
     def get_entier(self):
         return self._entier
@@ -100,15 +87,20 @@ class MetaGame:
 
     def getInt(self, move):
         new_int = (self._player << ((80 - move) << 1)) + self._entier
-        new_int &= ~(127 << 162)  ##Supprime dernier bit jouer ( 7 1er bits )
+        new_int &= ~(127 << 162)  # Supprime dernier bit jouer ( 7 1er bits )
         new_int += (move << 162)
         return new_int
-		
-		
+
     def possibleMoves(self):
         possible = []
         if self.winner() != 0:
             return possible
+
+        if self._entier == 0:
+            for i in range(0, 81):
+                possible.append(i)
+            return possible
+
         next_case = self._last % 9
         indice_deb = next_case * 9
         range_indice = range(indice_deb, indice_deb + 9)  # les coups possibles dans le petit tic tac toe
@@ -164,15 +156,15 @@ class MetaGame:
                     # TROUVER BELLE ALTERNATIVE (IF ELSE) ou plus clair
                     value = a + i * 9
 
-                    if (value != self._last):
+                    if value != self._last:
                         ligne += signe[valuea]
                     else:
                         ligne += (signe[valuea]).upper()
-                    if (value + 1 != self._last):
+                    if value + 1 != self._last:
                         ligne += signe[valueb]
                     else:
                         ligne += (signe[valueb]).upper()
-                    if (value + 2 != self._last):
+                    if value + 2 != self._last:
                         ligne += signe[valuec]
                     else:
                         ligne += (signe[valuec]).upper()
@@ -185,19 +177,6 @@ class MetaGame:
             if k != 2:
                 print("-" * 29)
             a += 18
-
-
-"""
-if __name__ == '__main__':
-
-    entier = 459329034283597291728327479273734123420780266358036
-    print(bin(entier))
-    meta = MetaGame(entier)
-    meta.OutputBoard()
-    meta.getInt(54)
-    meta = MetaGame(meta.getInt(54))
-    print(meta.possibleMoves())
-"""
 
 
 class Node:
@@ -224,11 +203,6 @@ class Node:
 
         stats_win = [n, 0, 0]
         possible = self._data.possibleMoves()  # get les coups possibles de l'adversaire
-        tmpmeta = self._data
-
-        #print(self._data.get_last())
-        #print(self._data.get_player())
-        #tmpmeta.OutputBoard()
 
         if not possible:
             return 0
@@ -245,23 +219,18 @@ class Node:
                     break
 
                 choix_random = random.choice(possible)  # prendre un coup au hasard
-                #print(possible)
-                #print("next play: " + str(choix_random) + " by " + str(player))
+
                 tmpmeta = MetaGame(tmpmeta.getInt(choix_random))  # faire le coup
-                #tmpmeta.OutputBoard()
+
                 # test fin de partie et update stats
                 win = tmpmeta.winner()
-                #print("WIN_STATE: " + str(win))
-                #print("player: " + str(player))
+
                 if win == player:
                     stats_win[player] += 1
-                    #print(stats_win)
                     break
                 elif win == 3:  # partie est nulle, pas de stats
                     break
-            #print("new stats")
 
-        #print(self._data.get_last())
         return stats_win
 
     def __str__(self):
@@ -340,74 +309,71 @@ class ArrayQueue:
         return self._size == 0
 
 
-# debut programme
-
-"""
 def p_mode(entier):
     MetaGame(entier).OutputBoard()
 
-def no_mode(entier):
-    ##créer une partie a partir de l'entier
-    ##Essait X combinaison de partie jusqua la fin
-    ##analyse statistics sortie selon les statistiques (W)
-    ##Joue le meilleur coup calculer a ce moment
-def a_mode(profondeur,entier):
-    ##créer une partie a partir de l'entier
-    ##genere un arbre avec la profondeur demandé
-    ##afficher l'arbre generer en breadth-first
-    ##Fin
-entier = 0;
 
-if(sys.argv[1] == "p") :
+def no_mode(entier):
+    # créer une partie a partir de l'entier
+    # Essait X combinaison de partie jusqua la fin
+    # analyse statistics sortie selon les statistiques (W)
+    # Joue le meilleur coup calculer a ce moment
+    main_tree = GameTree(Node(MetaGame(entier)))
+    stats = []
+    ratio = []
+
+    coups_possibles = main_tree.get_root().get_data().possibleMoves()
+    for coup in coups_possibles:
+        game_possible = MetaGame(main_tree.get_root().get_data().getInt(coup))
+        main_tree.get_root().add_child(Node(game_possible))
+
+    # test chaque enfant pour une fin de partie
+    for child in main_tree.get_root().get_children():
+        #print(child)
+        if child.get_data().winner() == main_tree.get_root().get_data().get_player():  # si le winner est le parent, win
+            print(child.get_data().get_entier())
+            # print(bin(child.get_data().get_entier()))
+            # print(child.get_data().get_last())
+            # child.get_data().OutputBoard()
+            sys.exit(0)
+
+    # aucun enfant ne termine la partie, constuire les stats
+    for child in main_tree.get_root().get_children():
+        stats.append(child.sample(1000))
+
+    print(stats)
+    # choisir meilleure stat
+    for i in range(0, len(stats)):
+        ratio.append(stats[i][main_tree.get_root().get_data().get_player()] / stats[i][0])  # nombre de partie/total
+
+    # get le best coup a jouer
+    best_coup = main_tree.get_root().get_children()[ratio.index(max(ratio))]
+    print(best_coup.get_data())
+
+
+def a_mode(profondeur,entier):
+    # créer une partie a partir de l'entier
+    # genere un arbre avec la profondeur demandé
+    # afficher l'arbre generer en breadth-first
+    # Fin
+    print("mode a")
+
+entier = 0
+
+if sys.argv[1] == "p" :
     p_mode(int(sys.argv[2]))
 
-elif(sys.argv[1] == "a") :
+elif sys.argv[1] == "a":
     profondeur = int(sys.argv[2])
     entier = int(sys.argv[3])
-    a_mode(profondeur,entier)
+    a_mode(profondeur, entier)
 
 else:
     entier = int(sys.argv[1])
     no_mode(entier)
-"""
 
-entier = 459329034283597291728327479273734123385595894269204
+# entier = 459329034283597291728327479273734123385595894269204
 # 459329034283597291728327479273734123420780266358036 exemple du tp
 # 457867532646266388810123794441017840401124333815060 modifié le o en pos 0 pour un x
 # 459329034283597291728327479273734123385595894269204 mod 0 en pos 58 en .
-#print(int(entier))
-
-# arbre avec profondeur de 1
-MAINTREE = GameTree(Node(MetaGame(entier)))
-
-coups_possibles = MAINTREE.get_root().get_data().possibleMoves()
-
-for coup in coups_possibles:
-    game_possible = MetaGame(MAINTREE.get_root().get_data().getInt(coup))
-    MAINTREE.get_root().add_child(Node(game_possible))
-
-stats = []
-# test chaque enfant pour une fin de partie
-for child in MAINTREE.get_root().get_children():
-    if child.get_data().winner() == MAINTREE.get_root().get_data().get_player():  # si le winner est le parent, win
-        print(child.get_data().get_entier())
-        # print(bin(child.get_data().get_entier()))
-        # print(child.get_data().get_last())
-        # child.get_data().OutputBoard()
-        sys.exit(0)
-    child.sample(1000)
-    stats.append(child.sample(1000))
-
-#choisir meilleure stat
-ratio = []
-for i in range(0, len(stats)):
-    ratio.append(stats[i][MAINTREE.get_root().get_data().get_player()] / stats[i][0])  # nombre de partie/total
-
-#get le best coup a jouer
-best_coup = MAINTREE.get_root().get_children()[ratio.index(max(ratio))]
-print(best_coup.get_data())
-
-
-
-
 
