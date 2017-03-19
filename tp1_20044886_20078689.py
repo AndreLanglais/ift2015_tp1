@@ -251,62 +251,12 @@ class GameTree:
             line += str(child.get_data()) + " "
         print(line)
 
-        def root(self):
-            return self._root
+    def root(self):
+        return self._root
 
-        def children(self, p):
-            p.get_children()
+    def children(self, p):
+        p.get_children()
 
-        def breadth_first_print(self):
-            ### TO DO : Generer larbre avec X étages
-            Q = ArrayQueue()
-            Q.enqueue(self.root())
-            while not Q.is_empty():
-                p = Q.dequeue()
-                print(p)
-                for c in self.children(p):
-                    Q.enqueue(c)
-
-
-##Queue pour afficher l'arbre de possibilité
-class ArrayQueue:
-    def __init__(self, capacity=1):
-        self._data = [None] * capacity
-        self._capacity = capacity
-        self._size = 0
-        self._front = 0
-
-    def __len__(self):
-        return self._size
-
-    def enqueue(self):
-        if self._size == len(self._data):
-            self._resize(2 * len(self._data))
-        avail = (self._front + self._size) % len(self._data)
-        self._data[avail] = elem
-        self._size += 1
-
-    def _resize(self, newcapacity):
-        old = self._data
-        self._data = [None] * newcapacity
-        walk = self._front
-        for k in range(self._size):
-            self._data[k] = old[walk]
-            walk = (1 + walk) % len(old)
-        self._front = 0
-        self._capacity = newcapacity
-
-    def dequeue(self):
-        if self.is_empty():
-            return False
-        else:
-            elem = self._data[self._front]
-            self._data[self._front] = None
-            self._front = (self._front + 1) % len(self._data)
-            return elem
-
-    def is_empty(self):
-        return self._size == 0
 
 
 def p_mode(entier):
@@ -356,7 +306,22 @@ def a_mode(profondeur,entier):
     # genere un arbre avec la profondeur demandé
     # afficher l'arbre generer en breadth-first
     # Fin
-    print("mode a")
+    rootgame = MetaGame(entier)
+    child = [rootgame]
+    next_child = []
+    printer = ""
+
+    for i in range(0,profondeur+1):
+        for game in child :
+            printer += str(game.get_entier()) + " "
+
+            for move in game.possibleMoves():
+                next_child.append(MetaGame(game.getInt(move)))
+
+        print(printer)
+        child = next_child
+        next_child = []
+        printer = ""
 
 entier = 0
 
