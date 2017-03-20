@@ -23,23 +23,19 @@ class Game:
             if valeur == 0:
                 cases_vides += 1
 
-        for winning_case in winners:  # check if x wins
-            count = 0
+        for winning_case in winners:
+            count_x = 0
+            count_o = 0
             for j in winning_case:
                 valeur = self._jeu >> ((8 - j) << 1) & 3
                 if valeur == 1:
-                    count += 1
-                if count == 3:
+                    count_x += 1
+                elif valeur == 2:
+                    count_o += 1
+                if count_x == 3:
                     win = 1
                     return win
-
-        for winning_case in winners:  # check if o wins
-            count = 0
-            for j in winning_case:
-                valeur = self._jeu >> ((8 - j) << 1) & 3
-                if valeur == 2:
-                    count += 1
-                if count == 3:
+                if count_o == 3:
                     win = 2
                     return win
 
@@ -69,20 +65,20 @@ class MetaGame:
         return str(self._entier)
 
     def winner(self):
-        q = 1
+        meta_tictactoe = 1  # UTT sous forme d'un tictactoe 3x3
         for i in range(0, 9):
-            r = range(0 + i * 9, 9 + i * 9)
-            t = 1
+            r = range(0 + i * 9, 9 + i * 9)  # extraction d'une sous-partie
+            tmp_game = 1  # entier pour stocker une sous-partie
             for j in r:
                 value = self._entier >> ((80 - j) << 1) & 3
-                t = (t << 2) + value
-            tmpgame = Game(t)
-            value = tmpgame.winner()  # test chaque sous partie pour un gagnant
+                tmp_game = (tmp_game << 2) + value
+            tmpgame = Game(tmp_game)
+            value = tmpgame.winner()  # test chaque sous-partie pour un gagnant
             value = 0 if value == 3 else value
-            q = (q << 2) + value
+            meta_tictactoe = (meta_tictactoe << 2) + value
 
-        # q devient un obj Game, test pour winner
-        tmpgame = Game(q)
+        # meta_tictactoe devient un obj Game, test pour winner
+        tmpgame = Game(meta_tictactoe)
         return tmpgame.winner()
 
     def getInt(self, move):
@@ -93,7 +89,7 @@ class MetaGame:
 
     def possibleMoves(self):
         possible = []
-        if self.winner() != 0:
+        if self.winner() != 0:  # la partie est deja gagnée
             return possible
 
         if self._entier == 0:
@@ -103,34 +99,34 @@ class MetaGame:
 
         next_case = self._last % 9
         indice_deb = next_case * 9
-        range_indice = range(indice_deb, indice_deb + 9)  # les coups possibles dans le petit tic tac toe
-        t = 1
+        range_indice = range(indice_deb, indice_deb + 9)
+        tmp_game = 1  # entier pour stocker une sous-partie
 
         for i in range_indice:
             value = self._entier >> ((80 - i) << 1) & 3
-            t = (t << 2) + value  # construire un petit tic tac toe
+            tmp_game = (tmp_game << 2) + value  # construire un petit tic tac toe
             if value == 0:
                 possible.append(i)  # garder les coups possibles en memoire
 
-        tmpgame = Game(t)
-        if tmpgame.winner() != 0:  # test s'il est possible de jouer dans le petit tic tac toe
+        tmpgame = Game(tmp_game)
+        if tmpgame.winner() != 0:
             possible = []
 
-        if not possible:  # on peut jouer dans un autre tic tac toe
+        if not possible:  # Il faut jouer dans une autre sous-partie.
             for i in range(0, 9):
                 if i == next_case:  # skip celui qu'y vient d'etre analyser
                     continue
                 r = range(0 + i * 9, 9 + i * 9)
-                t = 1
+                tmp_game = 1
                 tmp_possible = []
 
                 for j in r:
                     value = self._entier >> ((80 - j) << 1) & 3
-                    t = (t << 2) + value
+                    tmp_game = (tmp_game << 2) + value
                     if value == 0:
                         tmp_possible.append(j)
 
-                tmpgame = Game(t)
+                tmpgame = Game(tmp_game)
                 winstate = tmpgame.winner()  # test chaque sous partie pour un gagnant
                 if winstate == 0:  # la partie n'est pas fini, on peut y jouer
                     possible.extend(tmp_possible)
@@ -212,7 +208,7 @@ class Node:
             fin_de_partie = False
 
             while not fin_de_partie:
-                player = tmpmeta.get_player()  # bug : player devient 3 et corrupt la game
+                player = tmpmeta.get_player()
                 possible = tmpmeta.possibleMoves()
 
                 if not possible:
@@ -258,7 +254,6 @@ class GameTree:
         p.get_children()
 
 
-
 def p_mode(entier):
     MetaGame(entier).OutputBoard()
 
@@ -288,7 +283,10 @@ def no_mode(entier):
             sys.exit(0)
 
     # aucun enfant ne termine la partie, constuire les stats
+    i = 0
     for child in main_tree.get_root().get_children():
+        print(i)
+        i += 1
         stats.append(child.sample(1000))
 
     print(stats)
@@ -312,7 +310,7 @@ def a_mode(profondeur,entier):
     printer = ""
 
     for i in range(0,profondeur+1):
-        for game in child :
+        for game in child:
             printer += str(game.get_entier()) + " "
 
             for move in game.possibleMoves():
@@ -325,7 +323,7 @@ def a_mode(profondeur,entier):
 
 entier = 0
 
-if sys.argv[1] == "p" :
+if sys.argv[1] == "p":
     p_mode(int(sys.argv[2]))
 
 elif sys.argv[1] == "a":
