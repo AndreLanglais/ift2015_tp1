@@ -255,14 +255,9 @@ def no_mode(entier):
             sys.exit(0)
 
     # aucun enfant ne termine la partie, constuire les stats
-<<<<<<< HEAD
-    i = 0
-    for child in main_tree.get_root().get_children():
-        print(i)
-        i += 1
-=======
+
+
     for child in main_node.get_children():
->>>>>>> d3f6953d0bf89bc07a6063fd0c965dc80db12aef
         stats.append(child.sample(1000))
 
     print(stats)
