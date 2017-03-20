@@ -44,7 +44,7 @@ class Game:
                     return win
 
         return nulle if (cases_vides == 0 and win == 0) else win
-
+##End Game Class
 
 class MetaGame:
     def __init__(self, entier):
@@ -97,9 +97,7 @@ class MetaGame:
             return possible
 
         if self._entier == 0:
-            for i in range(0, 81):
-                possible.append(i)
-            return possible
+            return list(range(0, 81))
 
         next_case = self._last % 9
         indice_deb = next_case * 9
@@ -140,44 +138,39 @@ class MetaGame:
         return possible
 
     def OutputBoard(self):
-        a = 0  # Mettre plus significatif
-        ligne = ""
+        indicator = 0
+        line = ""
         signe = [" . ", " x ", " o ", " ? "]
 
         for k in range(0, 3):
             for j in range(0, 3):
                 for i in range(0, 3):
 
-                    # TROUVER BELLE ALTERNATIVE ou plus clair
-                    valuea = self._entier >> ((80 - (a + i * 9)) << 1) & 3
-                    valueb = self._entier >> ((80 - ((a + 1) + i * 9)) << 1) & 3
-                    valuec = self._entier >> ((80 - ((a + 2) + i * 9)) << 1) & 3
+                    values = []
+                    ## valeur des 3 cases d'une ligne d'une petite partie
+                    for ii in range(0,3):
+                        value = self._entier >> ((80 - ((indicator + ii) + i * 9)) << 1) & 3
+                        values.append(value)
 
-                    # TROUVER BELLE ALTERNATIVE (IF ELSE) ou plus clair
-                    value = a + i * 9
+                    slot = indicator + i * 9
 
-                    if value != self._last:
-                        ligne += signe[valuea]
-                    else:
-                        ligne += (signe[valuea]).upper()
-                    if value + 1 != self._last:
-                        ligne += signe[valueb]
-                    else:
-                        ligne += (signe[valueb]).upper()
-                    if value + 2 != self._last:
-                        ligne += signe[valuec]
-                    else:
-                        ligne += (signe[valuec]).upper()
+                    ##ajoute les 3 cases à notre ligne d'affichage
+                    for ii in range(0, 3):
+                        ## vérifie si on affiche le dernier coup jouer
+                        if slot + ii != self._last:
+                            line += signe[values[ii]]
+                        else:
+                            line += (signe[values[ii]]).upper()
 
-                    ligne += "|"
+                    line += "|"
 
-                print(ligne[:-1])
-                ligne = ""
-                a += 3
+                print(line[:-1])
+                line = ""
+                indicator += 3
             if k != 2:
                 print("-" * 29)
-            a += 18
-
+            indicator += 18
+##End MetaGame Class
 
 class Node:
     def __init__(self, data):
@@ -212,7 +205,7 @@ class Node:
             fin_de_partie = False
 
             while not fin_de_partie:
-                player = tmpmeta.get_player()  # bug : player devient 3 et corrupt la game
+                player = tmpmeta.get_player()
                 possible = tmpmeta.possibleMoves()
 
                 if not possible:
@@ -235,52 +228,29 @@ class Node:
 
     def __str__(self):
         return str(self.get_data())
-
-
-class GameTree:
-    def __init__(self, root):
-        self._root = root
-
-    def get_root(self):
-        return self._root
-
-    def print_tree(self):
-        print(str(self._root.get_data()))
-        line = ""
-        for child in self._root.get_children():
-            line += str(child.get_data()) + " "
-        print(line)
-
-    def root(self):
-        return self._root
-
-    def children(self, p):
-        p.get_children()
+##End Node Class
 
 
 
+##Function for p parameter
 def p_mode(entier):
     MetaGame(entier).OutputBoard()
 
-
+##Function for no parameter
 def no_mode(entier):
-    # créer une partie a partir de l'entier
-    # Essait X combinaison de partie jusqua la fin
-    # analyse statistics sortie selon les statistiques (W)
-    # Joue le meilleur coup calculer a ce moment
-    main_tree = GameTree(Node(MetaGame(entier)))
+    main_node = Node(MetaGame(entier))
     stats = []
     ratio = []
 
-    coups_possibles = main_tree.get_root().get_data().possibleMoves()
+    coups_possibles = main_node.get_data().possibleMoves()
     for coup in coups_possibles:
-        game_possible = MetaGame(main_tree.get_root().get_data().getInt(coup))
-        main_tree.get_root().add_child(Node(game_possible))
+        game_possible = MetaGame(main_node.get_data().getInt(coup))
+        main_node.add_child(Node(game_possible))
 
     # test chaque enfant pour une fin de partie
-    for child in main_tree.get_root().get_children():
-        #print(child)
-        if child.get_data().winner() == main_tree.get_root().get_data().get_player():  # si le winner est le parent, win
+    for child in main_node.get_children():
+        # print(child)
+        if child.get_data().winner() == main_node.get_data().get_player():  # si le winner est le parent, win
             print(child.get_data().get_entier())
             # print(bin(child.get_data().get_entier()))
             # print(child.get_data().get_last())
@@ -288,31 +258,29 @@ def no_mode(entier):
             sys.exit(0)
 
     # aucun enfant ne termine la partie, constuire les stats
-    for child in main_tree.get_root().get_children():
+    for child in main_node.get_children():
         stats.append(child.sample(1000))
 
     print(stats)
     # choisir meilleure stat
     for i in range(0, len(stats)):
-        ratio.append(stats[i][main_tree.get_root().get_data().get_player()] / stats[i][0])  # nombre de partie/total
+        ratio.append(stats[i][main_node.get_data().get_player()] / stats[i][0])  # nombre de partie/total
 
     # get le best coup a jouer
-    best_coup = main_tree.get_root().get_children()[ratio.index(max(ratio))]
+    best_coup = main_node.get_children()[ratio.index(max(ratio))]
     print(best_coup.get_data())
+##end no_mode Function
 
 
-def a_mode(profondeur,entier):
-    # créer une partie a partir de l'entier
-    # genere un arbre avec la profondeur demandé
-    # afficher l'arbre generer en breadth-first
-    # Fin
+##Function for a parameter
+def a_mode(profondeur, entier):
     rootgame = MetaGame(entier)
     child = [rootgame]
     next_child = []
     printer = ""
 
-    for i in range(0,profondeur+1):
-        for game in child :
+    for i in range(0, profondeur + 1):
+        for game in child:
             printer += str(game.get_entier()) + " "
 
             for move in game.possibleMoves():
@@ -323,9 +291,10 @@ def a_mode(profondeur,entier):
         next_child = []
         printer = ""
 
+
 entier = 0
 
-if sys.argv[1] == "p" :
+if sys.argv[1] == "p":
     p_mode(int(sys.argv[2]))
 
 elif sys.argv[1] == "a":
@@ -341,4 +310,3 @@ else:
 # 459329034283597291728327479273734123420780266358036 exemple du tp
 # 457867532646266388810123794441017840401124333815060 modifié le o en pos 0 pour un x
 # 459329034283597291728327479273734123385595894269204 mod 0 en pos 58 en .
-
