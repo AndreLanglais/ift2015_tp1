@@ -114,7 +114,7 @@ class MetaGame:
 
         if not possible:  # Il faut jouer dans une autre sous-partie.
             for i in range(0, 9):
-                if i == next_case:  # skip celui qu'y vient d'etre analyser
+                if i == next_case:  # Skip la case analyser precedemment
                     continue
                 r = range(0 + i * 9, 9 + i * 9)
                 tmp_game = 1
@@ -130,8 +130,6 @@ class MetaGame:
                 winstate = tmpgame.winner()  # test chaque sous partie pour un gagnant
                 if winstate == 0:  # la partie n'est pas fini, on peut y jouer
                     possible.extend(tmp_possible)
-                else:
-                    continue
 
         return possible
 
